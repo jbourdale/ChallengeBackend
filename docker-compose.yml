@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+
+  # ---------------------- BACKEND ----------------------
+  app:
+    build: ./
+    volumes:
+      - ./:/code
+    restart: on-failure
+    environment:
+      - ENVIRONMENT=development
+      - SECRET_KEY=2ymmbpcv(9@l@8-nc@-@5ldkvgrxv)(+bed^7392-vk%)bj^rj
+      - DB_NAME=app
+      - DB_USER=jbourdale
+      - DB_PASSWORD=password
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - CLIENT_ID="e18d6952d6854b6c9ab1a161a013e6e3"
+      - CLIENT_SECRET="7555b89676e34ac69a1c32c49b3dfef6"
+
+  # ---------------------- DATABASE ----------------------
+  postgres:
+  image: postgres
+  environment:
+    - POSTGRES_USER=jbourdale
+    - POSTGRES_PASSWORD=password
+    - POSTGRES_DB=app
+    - PGDATA=/data/postgres
+  volumes:
+    - ./postgres/data/dev:/data/postgres
+  restart: always
