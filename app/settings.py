@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 # Environment, must be "production" or "development"
-ENVIRONMENT = os.environ.get("ENVIRONMENT") || "production"
+ENVIRONMENT = os.environ.get("ENVIRONMENT") or "production"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY") || 'secret'
+SECRET_KEY = os.environ.get("SECRET_KEY") or 'secret'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -41,8 +41,11 @@ if (ENVIRONMENT == "development"):
 INSTALLED_APPS = [
     'new_releases',
 
+    'rest_framework',
+    'django_celery_beat',
+    'django_celery_results',
+
     'django_extensions',
-    'djangorestframework',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -89,11 +92,11 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.env('DB_NAME', 'app'),
-        'USER': os.environ.env('DB_USER', 'user'),
-        'PASSWORD': os.environ.env('DB_PASSWORD', 'password'),
-        'HOST': os.environ.env('DB_HOST', 'localhost'),
-        'PORT': os.environ.env('DB_PORT', 5432)
+        'NAME': os.environ.get('DB_NAME') or 'app',
+        'USER': os.environ.get('DB_USER') or 'user',
+        'PASSWORD': os.environ.get('DB_PASSWORD') or 'password',
+        'HOST': os.environ.get('DB_HOST') or 'localhost',
+        'PORT': os.environ.get('DB_PORT') or 5432
     }
 }
 
@@ -134,3 +137,36 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Spotify Web API Configuration
+
+SPOTIFY_CLIENT_ID = os.environ.get("CLIENT_ID")
+
+SPOTIFY_CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+
+# Interval duration (in seconds) between every refresh
+SPOTIFY_ARTISTS_REFRESH_INTERVAL = 30.0
+
+# Callback endpoint for OAuth2 spotify auth
+SPOTIFY_CALLBACK_URL = os.environ.get("SPOTIFY_CALLBACK_URL") or "http://localhost:5000/auth"
+
+SPOTIFY_AUTH_SCOPE = "user-read-email user-read-private"
+
+# Celery configuration
+
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672/celeryhost'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+# If time zones are active (USE_TZ = True) define your local
+
+CELERY_TIMEZONE = 'Europe/Paris'
+
+# We're going to have our tasks rolling soon, so that will be handy
+
+CELERY_BEAT_SCHEDULE = {
+    'synchronize_artists': {
+        'task': 'new_releases.tasks.synchronize_artists.synchronize_artists',
+        'schedule': SPOTIFY_ARTISTS_REFRESH_INTERVAL
+    }
+}
