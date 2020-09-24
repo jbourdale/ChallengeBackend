@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+
+  # ---------------------- BACKEND ----------------------
+  app:
+    build:
+      dockerfile: ./docker/Dockerfile.prod
+      context: .
+    command: gunicorn app.wsgi:application --bind 0.0.0.0:5000 --capture-output
+    expose:
+      - 5000
+    env_file:
+      - ./docker/.env.prod
+    depends_on:
+      - postgres
+    restart: always
+
+  # ---------------------- DATABASE ----------------------
+  postgres:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    env_file:
+      - ./docker/.env.prod.db
+    restart: always
+
+  # ------------------- REVERSE PROXY --------------------
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - 1337:80
+
+volumes:
+  postgres_data_prod:

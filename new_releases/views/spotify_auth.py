@@ -36,7 +36,8 @@ class AuthCallbackAPIView(AbstractBaseAuthAPIView):
             request.session['user_uuid'] = str(spotify_user.user_uuid)
             serializer = SpotifyUserSerializer(spotify_user)
             return Response(serializer.data)
-        except SpotifyTokenRequestInvalidException:
+        except SpotifyTokenRequestInvalidException as e:
+            raise e
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except Exception:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

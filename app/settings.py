@@ -28,14 +28,34 @@ SECRET_KEY = os.environ.get("SECRET_KEY") or 'secret'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-if (ENVIRONMENT == "development"):
+if ENVIRONMENT == "development":
     DEBUG = True
 
-ALLOWED_HOSTS = []
-if (ENVIRONMENT == "development"):
+ALLOWED_HOSTS = (os.environ.get("ALLOWED_HOSTS") or "").split(" ")
+if DEBUG:
     ALLOWED_HOSTS = ALLOWED_HOSTS + [
         "*"
     ]
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            }
+        },
+        'loggers': {
+            'django': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            },
+        },
+    }
 
 # Application definition
 INSTALLED_APPS = [
@@ -89,8 +109,8 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME') or 'app',
+        'ENGINE': os.environ.get('DB_ENGINE') or 'django.db.backends.sqlite3',
+        'NAME': os.environ.get('DB_NAME') or os.path.join(BASE_DIR, 'db.sqlite3'),
         'USER': os.environ.get('DB_USER') or 'user',
         'PASSWORD': os.environ.get('DB_PASSWORD') or 'password',
         'HOST': os.environ.get('DB_HOST') or 'localhost',
