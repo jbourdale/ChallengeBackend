@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import User
 
 from new_releases.models.abstract_model import AbstractBaseModel
 
@@ -14,4 +13,9 @@ class SpotifyUserModel(AbstractBaseModel):
     user_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return f"<SpotifyUser access_token={self.access_token} expires_in={self.expires_in} refresh_token={self.refresh_token} uuid={self.user_uuid}>"
+        return f"""<SpotifyUser
+            access_token={self.access_token}
+            expires_in={self.expires_in}
+            refresh_token={self.refresh_token}
+            uuid={self.user_uuid}
+        >"""

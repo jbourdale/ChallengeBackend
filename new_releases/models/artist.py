@@ -12,5 +12,10 @@ class ArtistModel(AbstractBaseModel):
     genres = models.ManyToManyField(GenreModel, blank=True)
 
     def __str__(self):
-       return f'<Artist spotify_id={str(self.spotify_id)} name={str(self.name)} followers={str(self.followers)} popularity={str(self.popularity)} genres={str(self.genres)}>'
-
+        return f"""<Artist
+            spotify_id={self.spotify_id}
+            name={self.name}
+            followers={self.followers}
+            popularity={self.popularity}
+            genres={self.genres}
+        >"""

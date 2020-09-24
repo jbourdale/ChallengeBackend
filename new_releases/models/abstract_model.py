@@ -43,12 +43,12 @@ class AbstractBaseModel(models.Model):
     raw_objects = models.Manager()
 
     def delete(self):
-        self.deleted_at=timezone.now()
+        self.deleted_at = timezone.now()
         self.save()
 
     def hard_delete(self):
         super().delete()
 
     def undelete(self):
-        self.deleted_at=None
+        self.deleted_at = None
         self.save()

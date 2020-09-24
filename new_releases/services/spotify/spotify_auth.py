@@ -1,11 +1,12 @@
+import base64
+import json
+import requests
+
 from django.conf import settings
 
-from datetime import datetime, timedelta
-import base64, json, requests
-from concurrent.futures import as_completed
-
-from new_releases.exceptions import SpotifyTokenRequestInvalidException
-from new_releases.models.spotify.token import SpotifyToken
+from new_releases.exceptions import (
+    SpotifyTokenRequestInvalidException
+)
 
 
 class SpotifyAuthAPIService():
@@ -28,22 +29,29 @@ class SpotifyAuthAPIService():
 
     def get_user_token(self, code):
         return self._get_token(
-            code, self.CLIENT_ID, self.CLIENT_SECRET, f"{self.CALLBACK_URL}/callback"
+            code,
+            self.CLIENT_ID,
+            self.CLIENT_SECRET,
+            f"{self.CALLBACK_URL}/callback"
         )
 
     def refresh_auth(self, spotify_user):
-        body = {"grant_type": "refresh_token", "refresh_token": spotify_user.refresh_token}
+        body = {
+            "grant_type": "refresh_token",
+            "refresh_token": spotify_user.refresh_token
+        }
 
-        encoded = base64.b64encode(f"{self.CLIENT_ID}:{self.CLIENT_SECRET}".encode()).decode()
+        encoded = base64.b64encode(
+            f"{self.CLIENT_ID}:{self.CLIENT_SECRET}".encode()
+        ).decode()
         post_refresh = requests.post(
             self.TOKEN_URL,
             data=body,
-            headers = {
+            headers={
                 "Content-Type": self.HEADER,
                 "Authorization": f"Basic {encoded}",
             }
         )
-        p_back = json.dumps(post_refresh.text)
         return self._handle_token(json.loads(post_refresh.text))
 
     def _get_auth(self, client_id, redirect_uri, scope):
@@ -64,7 +72,9 @@ class SpotifyAuthAPIService():
             "client_secret": client_secret,
         }
 
-        encoded = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+        encoded = base64.b64encode(
+            f"{client_id}:{client_secret}".encode()
+        ).decode()
         headers = {
             "Content-Type": self.HEADER,
             "Authorization": f"Basic {encoded}",
@@ -75,6 +85,5 @@ class SpotifyAuthAPIService():
 
     def _handle_token(self, response):
         if "error" in response:
-            print(response)
             raise SpotifyTokenRequestInvalidException(f"{response['error']}")
         return response

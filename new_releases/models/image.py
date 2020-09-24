@@ -11,5 +11,8 @@ class ImageModel(AbstractBaseModel):
     height = models.IntegerField(null=False)
 
     def __repr__(self):
-       return f'<Image url={self.url} width={self.width} height={self.height}>'
-
+        return f"""<Image
+            url={self.url}
+            width={self.width}
+            height={self.height}
+        >"""
