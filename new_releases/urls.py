@@ -16,5 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from . import views
+
+
 urlpatterns = [
+    path('auth', views.AuthAPIView.as_view()),
+    path('auth/callback', views.AuthCallbackAPIView.as_view()),
+    path('api/artists', views.ArtistReleasesAPIView.as_view())
 ]

@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from .spotify_auth import (
+    AuthAPIView,
+    AuthCallbackAPIView
+)
 
-# Create your views here.
+from .artists import (
+    ArtistReleasesAPIView
+)

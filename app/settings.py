@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import os
+import os, datetime
 from pathlib import Path
 
 
@@ -39,20 +39,18 @@ if (ENVIRONMENT == "development"):
 
 # Application definition
 INSTALLED_APPS = [
-    'new_releases',
+    'new_releases.apps.NewReleasesConfig',
 
     'rest_framework',
-    'django_celery_beat',
-    'django_celery_results',
-
-    'django_extensions',
 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -119,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -145,28 +142,9 @@ SPOTIFY_CLIENT_ID = os.environ.get("CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 
 # Interval duration (in seconds) between every refresh
-SPOTIFY_ARTISTS_REFRESH_INTERVAL = 30.0
+SPOTIFY_ARTISTS_REFRESH_INTERVAL = 1
 
 # Callback endpoint for OAuth2 spotify auth
 SPOTIFY_CALLBACK_URL = os.environ.get("SPOTIFY_CALLBACK_URL") or "http://localhost:5000/auth"
 
 SPOTIFY_AUTH_SCOPE = "user-read-email user-read-private"
-
-# Celery configuration
-
-CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672/celeryhost'
-
-CELERY_RESULT_BACKEND = 'django-db'
-
-# If time zones are active (USE_TZ = True) define your local
-
-CELERY_TIMEZONE = 'Europe/Paris'
-
-# We're going to have our tasks rolling soon, so that will be handy
-
-CELERY_BEAT_SCHEDULE = {
-    'synchronize_artists': {
-        'task': 'new_releases.tasks.synchronize_artists.synchronize_artists',
-        'schedule': SPOTIFY_ARTISTS_REFRESH_INTERVAL
-    }
-}
